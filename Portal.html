@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMKSC - M.Sc Computer Science Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body id="appBody" class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col antialiased relative transition-colors duration-300">
+
+    <div id="welcomeSplash" class="fixed inset-0 bg-gradient-to-br from-indigo-950 via-indigo-900 to-slate-900 z-50 flex flex-col items-center justify-center p-6 text-center transition-all duration-500">
+        <div class="max-w-md w-full bg-white/10 backdrop-blur-md p-10 rounded-2xl border border-white/20 shadow-2xl space-y-6">
+            <div class="w-20 h-20 bg-indigo-600/30 text-indigo-300 rounded-full flex items-center justify-center mx-auto border border-indigo-400/30">
+                <i data-lucide="graduation-cap" class="w-10 h-10"></i>
+            </div>
+            <div class="space-y-2">
+                <h1 class="text-3xl font-extrabold text-white tracking-tight">Welcome to SMKSC</h1>
+                <p class="text-indigo-200 text-sm">Postgraduate Computing Knowledge Base & Resource Repository</p>
+            </div>
+            <div class="space-y-3 pt-2">
+                <button onclick="openLoginModal('student')" class="w-full bg-white text-indigo-950 hover:bg-indigo-50 font-bold text-base py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center space-x-2 group">
+                    <span>Student Login</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition"></i>
+                </button>
+                <button onclick="openLoginModal('admin')" class="w-full bg-indigo-600/40 text-white hover:bg-indigo-600/60 border border-indigo-400/30 font-semibold text-sm py-2.5 px-6 rounded-xl transition">
+                    Admin Infrastructure Login
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header id="appHeader" class="bg-indigo-900 text-white shadow-md px-6 py-4 flex justify-between items-center transition-colors duration-300 relative z-30">
+        <div class="flex items-center space-x-3">
+            <i data-lucide="graduation-cap" class="w-8 h-8 text-indigo-300"></i>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight">SMKSC</h1>
+                <p class="text-xs text-indigo-200">M.Sc Computer Science Hub</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div id="headerAvatarContainer" class="hidden items-center space-x-2 bg-indigo-950/40 pl-2 pr-3 py-1 rounded-full border border-white/10">
+                <img id="headerProfileImg" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80&q=80" class="w-7 h-7 rounded-full object-cover border border-indigo-400">
+                <span id="headerProfileName" class="text-xs font-semibold text-indigo-200">Admin</span>
+            </div>
+
+            <button id="authBtn" onclick="toggleAuthModal()" class="flex items-center space-x-2 bg-indigo-700 hover:bg-indigo-600 transition px-4 py-2 rounded-lg font-medium text-sm">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+                <span id="authBtnText">Admin Login</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 relative z-10">
+       
+        <aside id="sidebarSettings" class="w-64 bg-white border-r border-gray-200 p-6 hidden flex-col justify-between shadow-sm transition-colors duration-300">
+            <div class="space-y-6">
+                <div class="flex items-center space-x-2 text-gray-400 uppercase tracking-wider text-xs font-bold mb-4">
+                    <i data-lucide="sliders" class="w-4 h-4"></i>
+                    <span>Admin Controls</span>
+                </div>
+                <nav class="space-y-1">
+                    <button onclick="switchAdminPanel('modules')" id="nav-modules" class="w-full flex items-center space-x-3 bg-indigo-50 text-indigo-700 px-4 py-2.5 rounded-lg font-medium text-sm text-left">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        <span>Module Manager</span>
+                    </button>
+                    <button onclick="switchAdminPanel('settings')" id="nav-settings" class="w-full flex items-center space-x-3 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-lg font-medium text-sm text-left transition">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        <span>System Settings</span>
+                    </button>
+                </nav>
+            </div>
+           
+            <div id="nodeBadge" class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 transition-colors duration-300">
+                <p class="text-xs text-indigo-800 font-semibold">Logged in as admin</p>
+                <p class="text-[11px] text-indigo-500 truncate">SMKSC Central Node</p>
+            </div>
+        </aside>
+
+        <main class="flex-1 p-8 max-w-5xl mx-auto w-full relative z-20">
+           
+            <div id="tabsHeaderContainer" class="border-b border-gray-200 mb-8 flex justify-between items-center transition-colors duration-300">
+                <nav class="flex space-x-8" aria-label="Tabs">
+                    <button id="tab-msc" class="border-b-2 border-indigo-600 text-indigo-600 py-4 px-1 font-semibold text-sm flex items-center space-x-2">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        <span>M.Sc Computer Science Hub</span>
+                    </button>
+                </nav>
+               
+                <div id="adminBadge" class="hidden items-center space-x-1.5 bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Elevated Editor Access</span>
+                </div>
+            </div>
+
+            <div id="panel-modules" class="admin-panel space-y-6">
+                <div id="content-msc" class="space-y-6">
+                   
+                    <div id="view-years" class="space-y-4">
+                        <div class="flex items-center gap-2 cursor-pointer group w-max pb-1" onclick="toggleAuthModal()">
+                            <i data-lucide="log-out" class="w-4 h-4 text-gray-400 group-hover:text-rose-500 transition"></i>
+                            <span class="text-sm font-semibold text-gray-500 group-hover:text-gray-400 transition back-btn-txt">Exit System Portal</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-30">
+                            <div onclick="selectYear(1)" id="card-year-1" class="year-card group bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition cursor-pointer flex items-center space-x-6">
+                                <div class="p-4 bg-indigo-50 rounded-xl group-hover:bg-indigo-100 transition text-indigo-600">
+                                    <i data-lucide="layers" class="w-8 h-8"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 year-card-title">1st Year M.Sc</h3>
+                                    <p class="text-gray-500 text-sm mt-0.5 year-card-desc">Semesters I & II • Core Foundational Modules</p>
+                                </div>
+                            </div>
+                            <div onclick="selectYear(2)" id="card-year-2" class="year-card group bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-purple-300 transition cursor-pointer flex items-center space-x-6">
+                                <div class="p-4 bg-purple-50 rounded-xl group-hover:bg-purple-100 transition text-purple-600">
+                                    <i data-lucide="award" class="w-8 h-8"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-gray-900 year-card-title">2nd Year M.Sc</h3>
+                                    <p class="text-gray-500 text-sm mt-0.5 year-card-desc">Semesters III & IV • Advanced Research & Electives</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="view-subjects" class="hidden space-y-6">
+                       
+                        <div id="adminCourseCreator" class="hidden bg-slate-900 text-white p-6 rounded-2xl shadow-md border border-slate-800 space-y-4">
+                            <div class="flex items-center space-x-2 text-indigo-400 uppercase tracking-wider text-xs font-bold">
+                                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                                <span>Course Management Console</span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Target Semester</label>
+                                    <select id="newCourseSem" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500"></select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-400 mb-1.5">Subject Code</label>
+                                    <input type="text" id="newCourseCode" placeholder="e.g., 436C1A" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 placeholder-slate-500">
+                                </div>
+                                <div class="md:col-span-2 flex gap-3">
+                                    <div class="flex-1">
+                                        <label class="block text-xs font-semibold text-slate-400 mb-1.5">Subject Name</label>
+                                        <input type="text" id="newCourseTitle" placeholder="e.g., QUANTUM INFRASTRUCTURES" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 placeholder-slate-500">
+                                    </div>
+                                    <button onclick="handleCreateCourse()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-lg text-sm font-semibold transition h-[38px] self-end shadow-md flex items-center space-x-1">
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                        <span>Add</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="modulesContainerTable" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-colors duration-300">
+                            <div class="p-5 border-b border-gray-100 bg-gray-50 flex justify-between items-center row-section-header transition-colors duration-300">
+                                <div class="flex items-center gap-2 cursor-pointer group" onclick="resetToYears()">
+                                    <i data-lucide="arrow-left" class="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition"></i>
+                                    <h3 id="subjectsTitle" class="font-bold text-gray-900 group-hover:text-indigo-900 transition table-header-txt">Available Modules</h3>
+                                </div>
+                                <span class="text-xs font-semibold bg-gray-200 text-gray-700 px-2.5 py-1 rounded-md" id="subjectCountBadge"></span>
+                            </div>
+                           
+                            <div id="semesterGroupsContainer" class="p-6 space-y-8">
+                                </div>
+                        </div>
+                    </div>
+
+                    <div id="view-resources" class="hidden space-y-6">
+                       
+                        <div class="flex items-center gap-2 cursor-pointer group w-max pb-2" onclick="goBackToSubjects()">
+                            <i data-lucide="arrow-left" class="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition"></i>
+                            <span class="text-sm font-semibold text-gray-500 group-hover:text-gray-700 transition back-btn-txt">Back to Modules</span>
+                        </div>
+
+                        <div id="adminUploadSection" class="hidden bg-gradient-to-r from-indigo-900 to-slate-900 text-white p-6 rounded-2xl shadow-sm">
+                            <div class="flex items-center space-x-2 text-indigo-300 uppercase tracking-wider text-xs font-bold mb-3">
+                                <i data-lucide="cloud-lightning" class="w-4 h-4"></i>
+                                <span>Admin File Engine</span>
+                            </div>
+                            <h4 class="text-lg font-bold mb-1">Upload Academic Content</h4>
+                            <p class="text-indigo-200 text-xs mb-6">Supported Formats: PDF (`.pdf`) and Word (`.doc`, `.docx` Documents)</p>
+                           
+                            <form id="uploadForm" onsubmit="handleFileUpload(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white/5 p-4 rounded-xl border border-white/10">
+                                <div>
+                                    <label class="block text-xs font-semibold text-indigo-200 mb-1.5">Asset Classification</label>
+                                    <select id="uploadType" class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400">
+                                        <option value="papers">Previous Question Paper</option>
+                                        <option value="notes">Lecture Notes / Study Guide</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-indigo-200 mb-1.5">Resource Title / Label</label>
+                                    <input type="text" id="uploadTitle" placeholder="e.g., April 2025 Exam Paper" required class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-indigo-400 placeholder-slate-500">
+                                </div>
+                                <div class="flex items-end">
+                                    <label class="flex-1 flex items-center justify-between bg-indigo-600 hover:bg-indigo-500 cursor-pointer text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm h-[38px]">
+                                        <span id="fileLabel" class="truncate max-w-[120px]">Choose file...</span>
+                                        <i data-lucide="paperclip" class="w-4 h-4 ml-2 flex-shrink-0"></i>
+                                        <input type="file" id="fileInput" onchange="updateFileLabel()" accept=".pdf,.doc,.docx" required class="hidden">
+                                    </label>
+                                    <button type="submit" class="ml-3 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm h-[38px] flex items-center">
+                                        <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div id="resourceContainerPanel" class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-colors duration-300">
+                            <div id="resourceSubtabHeader" class="flex border-b border-gray-100 bg-gray-50 transition-colors duration-300">
+                                <button onclick="switchResourceSubTab('papers')" id="subtab-papers" class="flex-1 py-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 flex justify-center items-center space-x-2">
+                                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                                    <span>Question Papers</span>
+                                </button>
+                                <button onclick="switchResourceSubTab('notes')" id="subtab-notes" class="flex-1 py-4 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex justify-center items-center space-x-2">
+                                    <i data-lucide="book-open-check" class="w-4 h-4"></i>
+                                    <span>Study Notes</span>
+                                </button>
+                            </div>
+                           
+                            <div class="p-6">
+                                <div id="resourcesEmptyState" class="hidden text-center py-12">
+                                    <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400 mb-3">
+                                        <i data-lucide="folder" class="w-6 h-6"></i>
+                                    </div>
+                                    <h4 class="font-medium text-gray-900 text-sm empty-state-txt">No assets discovered</h4>
+                                    <p class="text-xs text-gray-500 mt-1">This context container holds no files yet.</p>
+                                </div>
+                                <div id="resourcesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="panel-settings" class="admin-panel hidden space-y-6">
+               
+                <div class="flex items-center gap-2 cursor-pointer group w-max pb-1" onclick="switchAdminPanel('modules')">
+                    <i data-lucide="arrow-left" class="w-4 h-4 text-gray-400 group-hover:text-indigo-600 transition"></i>
+                    <span class="text-sm font-semibold text-gray-500 group-hover:text-gray-700 transition back-btn-txt">Back to Modules Dashboard</span>
+                </div>
+
+                <div id="adminProfileSettingsCard" class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4 transition-colors duration-300 nested-profile-container">
+                    <div class="border-b border-gray-100 pb-3">
+                        <h3 class="text-lg font-bold text-gray-900 profile-panel-title">Admin Identity Settings</h3>
+                        <p class="text-xs text-gray-500">Edit active security profile identification markers and branding avatar.</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-6 bg-gray-50 p-5 rounded-xl border border-gray-100 transition-colors duration-300 profile-inner-box">
+                        <div class="relative w-20 h-20 group flex-shrink-0">
+                            <img id="settingsPanelProfileImg" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80" class="w-20 h-20 rounded-full object-cover border-4 border-white shadow-md">
+                            <label class="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer transition duration-200 text-white text-xs font-semibold">
+                                <span>Edit</span>
+                                <input type="file" id="panelAvatarInput" onchange="handleProfilePictureEdit(event)" accept="image/*" class="hidden">
+                            </label>
+                        </div>
+                        <div class="space-y-1 text-center sm:text-left">
+                            <p class="text-xs uppercase text-gray-400 font-bold tracking-wider">Operational Node Mode</p>
+                            <h4 class="text-base font-extrabold text-gray-800 profile-name-txt">System Administrator</h4>
+                            <p class="text-xs text-gray-500 font-medium">Clearance Level: Elevated Infrastructure Repository Editor</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-colors duration-300 dropdown-card">
+                    <button onclick="toggleSettingsDropdown('dropdown-theme-content', 'theme-arrow-icon')" class="w-full flex items-center justify-between p-5 bg-gray-50/50 hover:bg-gray-50 transition border-b border-gray-100 dropdown-trigger">
+                        <div class="flex items-center space-x-3 text-gray-900 dropdown-title-wrapper">
+                            <i data-lucide="palette" class="w-5 h-5 text-indigo-500"></i>
+                            <h3 class="font-bold text-sm tracking-tight system-panel-title">System Theme Configuration</h3>
+                        </div>
+                        <i id="theme-arrow-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="dropdown-theme-content" class="hidden p-6 space-y-4 transition-colors duration-300 system-settings-container">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <button onclick="setSystemTheme('light')" id="theme-btn-light" class="flex items-center justify-between p-5 border-2 border-indigo-600 bg-indigo-50/30 rounded-xl transition text-left group">
+                                <div class="flex items-center space-x-4">
+                                    <div class="p-3 bg-white border border-indigo-100 text-indigo-600 rounded-lg shadow-sm">
+                                        <i data-lucide="sun" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900 light-card-title">Light Palette</p>
+                                        <p class="text-xs text-gray-500">Crisp high-contrast lighting layout</p>
+                                    </div>
+                                </div>
+                                <i data-lucide="check-circle" class="w-5 h-5 text-indigo-600"></i>
+                            </button>
+                            <button onclick="setSystemTheme('dark')" id="theme-btn-dark" class="flex items-center justify-between p-5 border-2 border-gray-200 hover:border-gray-300 rounded-xl transition text-left group">
+                                <div class="flex items-center space-x-4">
+                                    <div class="p-3 bg-slate-800 text-slate-400 rounded-lg shadow-sm">
+                                        <i data-lucide="moon" class="w-6 h-6"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-gray-900 dark-card-title">Dark Palette</p>
+                                        <p class="text-xs text-gray-400 dark-card-desc">Low luminosity operational night layout</p>
+                                    </div>
+                                </div>
+                                <i data-lucide="circle" class="w-5 h-5 text-gray-300 group-hover:text-gray-400 transition"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-colors duration-300 dropdown-card">
+                    <button onclick="toggleSettingsDropdown('dropdown-users-content', 'users-arrow-icon')" class="w-full flex items-center justify-between p-5 bg-gray-50/50 hover:bg-gray-50 transition border-b border-gray-100 dropdown-trigger">
+                        <div class="flex items-center space-x-3 text-gray-900 dropdown-title-wrapper">
+                            <i data-lucide="users" class="w-5 h-5 text-indigo-500"></i>
+                            <h3 class="font-bold text-sm tracking-tight access-panel-title">Student Access Management</h3>
+                        </div>
+                        <i id="users-arrow-icon" data-lucide="chevron-down" class="w-4 h-4 text-gray-400 transform transition-transform duration-200"></i>
+                    </button>
+                    <div id="dropdown-users-content" class="hidden p-6 space-y-6 transition-colors duration-300 user-access-container">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100 transition-colors duration-300 user-access-input-box">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5 text-label-user">New Student Username</label>
+                                <input type="text" id="newStudUser" placeholder="e.g., Student789" class="w-full border border-gray-200 rounded-lg px-3.5 py-1.5 text-sm focus:outline-none focus:border-indigo-500 bg-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1.5 text-label-pass">Cipher Password</label>
+                                <input type="text" id="newStudPass" placeholder="e.g., Pass999" class="w-full border border-gray-200 rounded-lg px-3.5 py-1.5 text-sm focus:outline-none focus:border-indigo-500 bg-white">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="handleCreateStudentUser()" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-semibold text-sm py-2 rounded-lg shadow-sm transition flex items-center justify-center gap-1">
+                                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                                    <span>Create Account</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="border border-gray-100 rounded-xl overflow-hidden shadow-sm table-access-border">
+                            <table class="min-w-full divide-y divide-gray-200 text-left">
+                                <thead class="bg-gray-50/70 text-gray-400 uppercase text-[11px] font-bold tracking-wider table-access-thead">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3">Role</th>
+                                        <th scope="col" class="px-6 py-3">Username</th>
+                                        <th scope="col" class="px-6 py-3">Password Reference</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentUsersTableBody" class="divide-y divide-gray-100 bg-white text-sm table-access-tbody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+
+    <div id="loginModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-sm w-full overflow-hidden transition-all transform scale-95 duration-200" id="modalCard">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <div class="flex items-center space-x-2 text-indigo-900">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
+                    <h3 id="modalGatekeeperTitle" class="font-bold">System Gatekeeper</h3>
+                </div>
+                <button onclick="toggleAuthModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form onsubmit="handleLogin(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">User Identity Username</label>
+                    <input type="text" id="username" placeholder="Enter User ID" required class="w-full border border-gray-200 rounded-lg px-3.5 py-2 text-sm focus:outline-none focus:border-indigo-500 bg-gray-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Security Cipher</label>
+                    <div class="relative flex items-center">
+                        <input type="password" id="password" placeholder="••••••••••••" required class="w-full border border-gray-200 rounded-lg pl-3.5 pr-10 py-2 text-sm focus:outline-none focus:border-indigo-500 bg-gray-50">
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none flex items-center">
+                            <i id="passwordToggleIcon" data-lucide="eye" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="loginError" class="text-rose-600 text-xs font-medium hidden flex items-center space-x-1">
+                    <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                    <span>Invalid credential authorization parameters.</span>
+                </div>
+                <button type="submit" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-semibold text-sm py-2.5 rounded-lg shadow-sm transition">
+                    Authenticate Identity
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toastNotification" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center space-x-3 pointer-events-none opacity-0 transform translate-y-2 transition-all duration-300 border border-slate-800">
+        <div class="w-8 h-8 bg-emerald-500/20 text-emerald-400 rounded-lg flex items-center justify-center">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+        </div>
+        <div>
+            <p class="text-xs text-slate-400 font-medium">Action Completed</p>
+            <p id="toastMessage" class="text-sm font-semibold text-slate-100 truncate max-w-[240px]">Update Completed</p>
+        </div>
+    </div>
+
+    <footer id="appFooter" class="bg-white border-t border-gray-200 py-4 px-6 text-center text-xs text-gray-400 mt-auto transition-colors duration-300">
+        &copy; 2026 SMKSC Computing Repository. Operational Unit Control.
+    </footer>
+
+    <script>
+        let curriculumData = {
+            1: {
+                "1st Semester": [
+                    { id: "436C1A", title: "ADVANCED DATA STRUCTURES AND ALGORITHMS" },
+                    { id: "436C1B", title: "ADVANCED PYTHON PROGRAMMING" },
+                    { id: "436E1A", title: "CLOUD COMPUTING" },
+                    { id: "436E1D", title: "PRINCIPLES OF COMPILER DESIGN" }
+                ],
+                "2nd Semester": [
+                    { id: "436E2A", title: "ARTIFICIAL INTELLIGENCE" },
+                    { id: "436C2B", title: "WEB TECHNOLOGY AND ADVANCED JAVA" },
+                    { id: "436E2E", title: "AGILE SOFTWARE ENGINEERING" },
+                    { id: "436C2A", title: "DATA MINING AND WAREHOUSING" }
+                ]
+            },
+            2: {
+                "3rd Semester": [],
+                "4th Semester": []
+            }
+        };
+
+        let usersPool = [
+            { username: "Student123", password: "Welcome123", role: "student" }
+        ];
+
+        let documentRepository = {
+            "436C1A": { papers: [], notes: [] },
+            "436E2A": { papers: [], notes: [] }
+        };
+
+        let state = {
+            isAdmin: false,
+            isStudent: false,
+            currentRoleMode: 'student',
+            selectedYear: null,
+            selectedSubject: null,
+            activeResourceTab: 'papers',
+            editingCourseId: null,
+            activeAdminPanel: 'modules',
+            systemTheme: 'light'
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderState();
+            renderStudentUsersList();
+        });
+
+        // WELCOME SCREEN MANAGEMENT OVERLAY FIXED (POINTER-EVENTS BLOCKS ELIMINATED)
+        function dismissWelcomeScreen() {
+            const welcomeScreen = document.getElementById('welcomeSplash');
+            welcomeScreen.classList.add('opacity-0');
+            welcomeScreen.style.pointerEvents = 'none';
+            setTimeout(() => { welcomeScreen.remove(); }, 500);
+        }
+
+        function openLoginModal(role) {
+            state.currentRoleMode = role;
+            const heading = document.getElementById('modalGatekeeperTitle');
+            heading.innerText = role === 'admin' ? 'Administrative Gatekeeper' : 'Student Access Verification';
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+
+        function renderState() {
+            const sidebar = document.getElementById('sidebarSettings');
+            const adminBadge = document.getElementById('adminBadge');
+            const adminUploadSection = document.getElementById('adminUploadSection');
+            const authBtnText = document.getElementById('authBtnText');
+            const authBtn = document.getElementById('authBtn');
+            const adminCreator = document.getElementById('adminCourseCreator');
+            const avatarHeader = document.getElementById('headerAvatarContainer');
+
+            if (state.isAdmin) {
+                sidebar.classList.remove('hidden'); sidebar.classList.add('flex');
+                adminBadge.classList.remove('hidden'); adminBadge.classList.add('flex');
+                adminUploadSection.classList.remove('hidden');
+                if(adminCreator) adminCreator.classList.remove('hidden');
+                authBtnText.innerText = "Secure Logout";
+                authBtn.className = "flex items-center space-x-2 bg-rose-700 hover:bg-rose-600 transition px-4 py-2 rounded-lg font-medium text-sm text-white";
+                avatarHeader.classList.remove('hidden'); avatarHeader.classList.add('flex');
+            } else if (state.isStudent) {
+                sidebar.classList.remove('flex'); sidebar.classList.add('hidden');
+                adminBadge.classList.add('hidden'); adminBadge.classList.remove('flex');
+                adminUploadSection.classList.add('hidden');
+                if(adminCreator) adminCreator.classList.add('hidden');
+                authBtnText.innerText = "Student Logout";
+                authBtn.className = "flex items-center space-x-2 bg-amber-700 hover:bg-amber-600 transition px-4 py-2 rounded-lg font-medium text-sm text-white";
+                avatarHeader.classList.add('hidden'); avatarHeader.classList.remove('flex');
+            } else {
+                sidebar.classList.remove('flex'); sidebar.classList.add('hidden');
+                adminBadge.classList.remove('flex'); adminBadge.classList.add('hidden');
+                adminUploadSection.classList.add('hidden');
+                if(adminCreator) adminCreator.classList.add('hidden');
+                authBtnText.innerText = "Portal Sign In";
+                authBtn.className = "flex items-center space-x-2 bg-indigo-700 hover:bg-indigo-600 transition px-4 py-2 rounded-lg font-medium text-sm text-white";
+                avatarHeader.classList.add('hidden'); avatarHeader.classList.remove('flex');
+            }
+
+            document.querySelectorAll('.admin-panel').forEach(p => p.classList.add('hidden'));
+            if(state.isAdmin) {
+                document.getElementById(`panel-${state.activeAdminPanel}`).classList.remove('hidden');
+            } else {
+                document.getElementById('panel-modules').classList.remove('hidden');
+            }
+
+            const viewYears = document.getElementById('view-years');
+            const viewSubjects = document.getElementById('view-subjects');
+            const viewResources = document.getElementById('view-resources');
+
+            if (state.selectedYear === null) {
+                viewYears.classList.remove('hidden'); viewSubjects.classList.add('hidden'); viewResources.classList.add('hidden');
+            } else if (state.selectedSubject === null) {
+                viewYears.classList.add('hidden'); viewSubjects.classList.remove('hidden'); viewResources.classList.add('hidden');
+                populateAdminSemOptions();
+                renderSubjectsList();
+            } else {
+                viewYears.classList.add('hidden'); viewSubjects.classList.add('hidden'); viewResources.classList.remove('hidden');
+                renderResourcesView();
+            }
+            lucide.createIcons();
+        }
+
+        function switchAdminPanel(panelName) {
+            state.activeAdminPanel = panelName;
+            state.selectedYear = null;
+            state.selectedSubject = null;
+            state.editingCourseId = null;
+
+            document.querySelectorAll('#sidebarSettings nav button').forEach(b => {
+                b.className = "w-full flex items-center space-x-3 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-lg font-medium text-sm text-left transition";
+            });
+           
+            const targetBtn = document.getElementById(`nav-${panelName}`);
+            if (targetBtn) {
+                targetBtn.className = "w-full flex items-center space-x-3 bg-indigo-50 text-indigo-700 px-4 py-2.5 rounded-lg font-medium text-sm text-left";
+            }
+            renderState();
+        }
+
+        function toggleSettingsDropdown(elementId, arrowId) {
+            const content = document.getElementById(elementId);
+            const arrow = document.getElementById(arrowId);
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                arrow.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                arrow.classList.remove('rotate-180');
+            }
+        }
+
+        function populateAdminSemOptions() {
+            const select = document.getElementById('newCourseSem');
+            if(!select) return;
+            const yearData = curriculumData[state.selectedYear] || {};
+            select.innerHTML = Object.keys(yearData).map(sem => `<option value="${sem}">${sem}</option>`).join('');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const uidInput = document.getElementById('username').value.trim();
+            const cipherInput = document.getElementById('password').value.trim();
+            const errBadge = document.getElementById('loginError');
+
+            if (state.currentRoleMode === 'admin') {
+                if (uidInput === 'Test' && cipherInput === '123') {
+                    state.isAdmin = true; state.isStudent = false;
+                    finalizeLoginFlow();
+                } else { errBadge.classList.remove('hidden'); }
+            } else {
+                const matchedStudent = usersPool.find(u => u.username === uidInput && u.password === cipherInput);
+                if (matchedStudent) {
+                    state.isStudent = true; state.isAdmin = false;
+                    finalizeLoginFlow();
+                } else { errBadge.classList.remove('hidden'); }
+            }
+        }
+
+        function finalizeLoginFlow() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('loginModal').classList.add('hidden');
+            dismissWelcomeScreen();
+            resetToYears();
+            renderState();
+        }
+
+        function toggleAuthModal() {
+            if (state.isAdmin || state.isStudent) {
+                state.isAdmin = false; state.isStudent = false;
+                resetToYears();
+                renderState();
+                window.location.reload();
+            } else {
+                openLoginModal('student');
+            }
+        }
+
+        function handleProfilePictureEdit(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const imgUrl = URL.createObjectURL(file);
+                document.getElementById('sidebarProfileImg').src = imgUrl;
+                document.getElementById('settingsPanelProfileImg').src = imgUrl;
+                document.getElementById('headerProfileImg').src = imgUrl;
+                showToastNotification("Profile image updated mapping signature.");
+            }
+        }
+
+        function handleCreateStudentUser() {
+            const u = document.getElementById('newStudUser').value.trim();
+            const p = document.getElementById('newStudPass').value.trim();
+           
+            if(!u || !p) return alert("Validation error: Empty inputs.");
+            if(usersPool.some(user => user.username === u)) return alert("Duplicate identity reference key.");
+
+            usersPool.push({ username: u, password: p, role: 'student' });
+            document.getElementById('newStudUser').value = '';
+            document.getElementById('newStudPass').value = '';
+           
+            renderStudentUsersList();
+            showToastNotification("Provisioned Student Node: " + u);
+        }
+
+        function renderStudentUsersList() {
+            const body = document.getElementById('studentUsersTableBody');
+            if(!body) return;
+            body.innerHTML = usersPool.map(u => `
+                <tr class="border-b border-gray-100 student-user-row">
+                    <td class="px-6 py-3 whitespace-nowrap"><span class="px-2 py-0.5 bg-amber-100 text-amber-800 font-bold rounded-md text-[10px] uppercase">Student</span></td>
+                    <td class="px-6 py-3 font-semibold text-gray-700 username-cell-txt">${u.username}</td>
+                    <td class="px-6 py-3 font-mono text-xs text-gray-400">${u.password}</td>
+                </tr>
+            `).join('');
+        }
+
+        function setSystemTheme(theme) {
+            state.systemTheme = theme;
+            const body = document.getElementById('appBody');
+            const footer = document.getElementById('appFooter');
+            const header = document.getElementById('appHeader');
+            const sidebar = document.getElementById('sidebarSettings');
+            const tabsContainer = document.getElementById('tabsHeaderContainer');
+            const modTable = document.getElementById('modulesContainerTable');
+            const rPanel = document.getElementById('resourceContainerPanel');
+            const rHeader = document.getElementById('resourceSubtabHeader');
+           
+            const dropdowns = document.querySelectorAll('.dropdown-card');
+            const triggers = document.querySelectorAll('.dropdown-trigger');
+            const accessBox = document.querySelector('.user-access-container');
+            const settingBox = document.querySelector('.system-settings-container');
+            const pBox = document.querySelector('.nested-profile-container');
+
+            if (theme === 'dark') {
+                body.className = "bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased relative transition-colors duration-300";
+                footer.className = "bg-slate-900 border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500 mt-auto transition-colors duration-300";
+                header.className = "bg-slate-900 text-white shadow-md px-6 py-4 flex justify-between items-center transition-colors duration-300";
+                sidebar.className = "w-64 bg-slate-900 border-r border-slate-800 p-6 hidden flex-col justify-between shadow-sm transition-colors duration-300";
+                tabsContainer.className = "border-b border-slate-800 mb-8 flex justify-between items-center transition-colors duration-300";
+               
+                if(modTable) modTable.className = "bg-slate-900 rounded-2xl border border-slate-800 shadow-sm overflow-hidden transition-colors duration-300";
+                if(rPanel) rPanel.className = "bg-slate-900 rounded-2xl border border-slate-800 shadow-sm overflow-hidden transition-colors duration-300";
+                if(rHeader) rHeader.className = "flex border-b border-slate-800 bg-slate-900/40 transition-colors duration-300";
+               
+                dropdowns.forEach(d => d.className = "bg-slate-900 rounded-2xl border border-slate-800 shadow-sm overflow-hidden transition-colors duration-300 dropdown-card");
+                triggers.forEach(t => t.className = "w-full flex items-center justify-between p-5 bg-slate-900/40 hover:bg-slate-900 transition border-b border-slate-800 dropdown-trigger");
+               
+                if(accessBox) accessBox.className = "p-6 space-y-6 transition-colors duration-300 user-access-container text-slate-100 bg-slate-950/40";
+                if(settingBox) settingBox.className = "p-6 space-y-4 transition-colors duration-300 system-settings-container text-slate-100 bg-slate-950/40";
+                if(pBox) pBox.className = "bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-sm space-y-4 transition-colors duration-300 text-slate-100";
+
+                document.getElementById('theme-btn-dark').className = "flex items-center justify-between p-5 border-2 border-indigo-600 bg-indigo-950/30 rounded-xl transition text-left group";
+                document.getElementById('theme-btn-light').className = "flex items-center justify-between p-5 border-2 border-slate-800 rounded-xl transition text-left group";
+            } else {
+                body.className = "bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col antialiased relative transition-colors duration-300";
+                footer.className = "bg-white border-t border-gray-200 py-4 px-6 text-center text-xs text-gray-400 mt-auto transition-colors duration-300";
+                header.className = "bg-indigo-900 text-white shadow-md px-6 py-4 flex justify-between items-center transition-colors duration-300";
+                sidebar.className = "w-64 bg-white border-r border-gray-200 p-6 hidden flex-col justify-between shadow-sm transition-colors duration-300";
+                tabsContainer.className = "border-b border-gray-200 mb-8 flex justify-between items-center transition-colors duration-300";
+               
+                if(modTable) modTable.className = "bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-colors duration-300";
+                if(rPanel) rPanel.className = "bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-colors duration-300";
+                if(rHeader) rHeader.className = "flex border-b border-gray-100 bg-gray-50 transition-colors duration-300";
+               
+                dropdowns.forEach(d => d.className = "bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden transition-colors duration-300 dropdown-card");
+                triggers.forEach(t => t.className = "w-full flex items-center justify-between p-5 bg-gray-50/50 hover:bg-gray-50 transition border-b border-gray-100 dropdown-trigger");
+               
+                if(accessBox) accessBox.className = "p-6 space-y-6 transition-colors duration-300 user-access-container text-gray-800 bg-gray-50/30";
+                if(settingBox) settingBox.className = "p-6 space-y-4 transition-colors duration-300 system-settings-container text-gray-800 bg-gray-50/30";
+                if(pBox) pBox.className = "bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4 transition-colors duration-300 text-gray-800";
+
+                document.getElementById('theme-btn-light').className = "flex items-center justify-between p-5 border-2 border-indigo-600 bg-indigo-50/30 rounded-xl transition text-left group";
+                document.getElementById('theme-btn-dark').className = "flex items-center justify-between p-5 border-2 border-gray-200 rounded-xl transition text-left group";
+            }
+
+            document.querySelectorAll('.year-card').forEach(c => {
+                c.className = theme === 'dark' ? "year-card group bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-sm hover:shadow-md hover:border-indigo-500 transition cursor-pointer flex items-center space-x-6" : "year-card group bg-white p-8 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-indigo-300 transition cursor-pointer flex items-center space-x-6";
+            });
+            document.querySelectorAll('.year-card-title').forEach(t => t.className = theme === 'dark' ? "text-lg font-bold text-slate-100 year-card-title" : "text-lg font-bold text-gray-900 year-card-title");
+            document.querySelectorAll('.row-section-header').forEach(h => h.className = theme === 'dark' ? "p-5 border-b border-slate-800 bg-slate-900/60 flex justify-between items-center row-section-header transition-colors duration-300" : "p-5 border-b border-gray-100 bg-gray-50 flex justify-between items-center row-section-header transition-colors duration-300");
+            document.querySelectorAll('.table-header-txt').forEach(x => x.className = theme === 'dark' ? "font-bold text-slate-200 group-hover:text-indigo-400 transition table-header-txt" : "font-bold text-gray-900 group-hover:text-indigo-900 transition table-header-txt");
+            document.querySelectorAll('.empty-state-txt').forEach(e => e.className = theme === 'dark' ? "font-medium text-slate-300 text-sm empty-state-txt" : "font-medium text-gray-900 text-sm empty-state-txt");
+            document.querySelectorAll('.back-btn-txt').forEach(b => b.className = theme === 'dark' ? "text-sm font-semibold text-slate-400 group-hover:text-slate-200 transition back-btn-txt" : "text-sm font-semibold text-gray-500 group-hover:text-gray-700 transition back-btn-txt");
+            document.querySelectorAll('.access-panel-title').forEach(t => t.className = theme === 'dark' ? "text-base font-bold text-slate-100 access-panel-title" : "text-base font-bold text-gray-900 access-panel-title");
+            document.querySelectorAll('.system-panel-title').forEach(t => t.className = theme === 'dark' ? "text-base font-bold text-slate-100 system-panel-title" : "text-base font-bold text-gray-900 system-panel-title");
+            document.querySelectorAll('.profile-panel-title').forEach(t => t.className = theme === 'dark' ? "text-lg font-bold text-slate-100 profile-panel-title" : "text-lg font-bold text-gray-900 profile-panel-title");
+            document.querySelectorAll('.light-card-title').forEach(t => t.className = theme === 'dark' ? "font-bold text-slate-300 light-card-title" : "font-bold text-gray-900 light-card-title");
+            document.querySelectorAll('.dark-card-title').forEach(t => t.className = theme === 'dark' ? "font-bold text-indigo-400 dark-card-title" : "font-bold text-gray-900 dark-card-title");
+            document.querySelectorAll('.username-cell-txt').forEach(c => c.className = theme === 'dark' ? "px-6 py-3 font-semibold text-slate-300 username-cell-txt" : "px-6 py-3 font-semibold text-gray-700 username-cell-txt");
+           
+            const userBox = document.querySelector('.user-access-input-box');
+            if(userBox) userBox.className = theme === 'dark' ? "grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800 transition-colors duration-300 user-access-input-box" : "grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-100 transition-colors duration-300 user-access-input-box";
+           
+            const innerBox = document.querySelector('.profile-inner-box');
+            if(innerBox) innerBox.className = theme === 'dark' ? "flex flex-col sm:flex-row items-center gap-6 bg-slate-950 p-5 rounded-xl border border-slate-800 transition-colors duration-300 profile-inner-box" : "flex flex-col sm:flex-row items-center gap-6 bg-gray-50 p-5 rounded-xl border border-gray-100 transition-colors duration-300 profile-inner-box";
+           
+            const profileName = document.getElementById('profileCardName');
+            if(profileName) profileName.className = theme === 'dark' ? "text-sm font-bold text-slate-300 tracking-tight" : "text-sm font-bold text-gray-700 tracking-tight";
+           
+            const pNameTxt = document.querySelector('.profile-name-txt');
+            if(pNameTxt) pNameTxt.className = theme === 'dark' ? "text-base font-extrabold text-slate-200 profile-name-txt" : "text-base font-extrabold text-gray-800 profile-name-txt";
+
+            const nBadge = document.getElementById('nodeBadge');
+            if(nBadge) nBadge.className = theme === 'dark' ? "bg-slate-950 p-4 rounded-xl border border-slate-800 transition-colors duration-300" : "bg-indigo-50 p-4 rounded-xl border border-indigo-100 transition-colors duration-300";
+
+            const sidebarProfile = document.getElementById('sidebarProfileCard');
+            if(sidebarProfile) sidebarProfile.className = theme === 'dark' ? "bg-slate-950 border border-slate-800 rounded-xl p-4 text-center space-y-3 transition-colors duration-300" : "bg-gray-50 border border-gray-100 rounded-xl p-4 text-center space-y-3 transition-colors duration-300";
+
+            const lblUser = document.querySelector('.text-label-user');
+            if(lblUser) lblUser.className = theme === 'dark' ? "block text-xs font-semibold text-slate-400 mb-1.5 text-label-user" : "block text-xs font-semibold text-gray-500 mb-1.5 text-label-user";
+            const lblPass = document.querySelector('.text-label-pass');
+            if(lblPass) lblPass.className = theme === 'dark' ? "block text-xs font-semibold text-slate-400 mb-1.5 text-label-pass" : "block text-xs font-semibold text-gray-500 mb-1.5 text-label-pass";
+
+            const tBorder = document.querySelector('.table-access-border');
+            if(tBorder) tBorder.className = theme === 'dark' ? "border border-slate-800 rounded-xl overflow-hidden shadow-sm table-access-border" : "border border-gray-100 rounded-xl overflow-hidden shadow-sm table-access-border";
+            const tThead = document.querySelector('.table-access-thead');
+            if(tThead) tThead.className = theme === 'dark' ? "bg-slate-950 text-slate-400 uppercase text-[11px] font-bold tracking-wider table-access-thead" : "bg-gray-50/70 text-gray-400 uppercase text-[11px] font-bold tracking-wider table-access-thead";
+            const tTbody = document.querySelector('.table-access-tbody');
+            if(tTbody) tTbody.className = theme === 'dark' ? "divide-y divide-slate-800 bg-slate-900 text-sm table-access-tbody" : "divide-y divide-gray-100 bg-white text-sm table-access-tbody";
+
+            renderSubjectsList();
+        }
+
+        function selectYear(yearValue) {
+            state.selectedYear = yearValue;
+            state.selectedSubject = null;
+            renderState();
+        }
+
+        function selectSubject(subjId) {
+            const yearData = curriculumData[state.selectedYear];
+            let foundSubject = null;
+           
+            for (const sem in yearData) {
+                const match = yearData[sem].find(s => s.id === subjId);
+                if (match) { foundSubject = match; break; }
+            }
+            state.selectedSubject = foundSubject;
+            renderState();
+        }
+
+        function selectYear(yearValue) {
+            state.selectedYear = yearValue;
+            state.selectedSubject = null;
+            renderState();
+        }
+
+        function selectSubject(subjId) {
+            const yearData = curriculumData[state.selectedYear];
+            let foundSubject = null;
+           
+            for (const sem in yearData) {
+                const match = yearData[sem].find(s => s.id === subjId);
+                if (match) { foundSubject = match; break; }
+            }
+            state.selectedSubject = foundSubject;
+            renderState();
+        }
+
+        function resetToYears() {
+            state.selectedYear = null;
+            state.selectedSubject = null;
+            renderState();
+        }
+
+        function goBackToSubjects() {
+            state.selectedSubject = null;
+            state.editingCourseId = null;
+            renderState();
+        }
+
+        function handleCreateCourse() {
+            const sem = document.getElementById('newCourseSem').value;
+            const code = document.getElementById('newCourseCode').value.trim().toUpperCase();
+            const title = document.getElementById('newCourseTitle').value.trim().toUpperCase();
+
+            if (!code || !title) return alert("Validation Error: Missing parameters.");
+
+            const yearData = curriculumData[state.selectedYear];
+            for (const sName in yearData) {
+                if (yearData[sName].some(c => c.id === code)) return alert("Code mapping already exists.");
+            }
+
+            curriculumData[state.selectedYear][sem].push({ id: code, title: title });
+            document.getElementById('newCourseCode').value = '';
+            document.getElementById('newCourseTitle').value = '';
+
+            renderSubjectsList();
+            showToastNotification("Ingested Course: " + code);
+        }
+
+        function setEditingState(courseId, event) {
+            if (event) event.stopPropagation();
+            state.editingCourseId = courseId;
+            renderSubjectsList();
+        }
+
+        function cancelEditingState(event) {
+            if (event) event.stopPropagation();
+            state.editingCourseId = null;
+            renderSubjectsList();
+        }
+
+        function saveCourseEdits(oldCode, event) {
+            if (event) event.stopPropagation();
+           
+            const rowElement = document.getElementById(`edit-row-${oldCode}`);
+            const newCode = rowElement.querySelector('.edit-code-input').value.trim().toUpperCase();
+            const newTitle = rowElement.querySelector('.edit-title-input').value.trim().toUpperCase();
+
+            if (!newCode || !newTitle) return alert("Validation error.");
+
+            const yearData = curriculumData[state.selectedYear];
+           
+            for (const semName in yearData) {
+                const idx = yearData[semName].findIndex(c => c.id === oldCode);
+                if (idx !== -1) {
+                    yearData[semName][idx] = { id: newCode, title: newTitle };
+                    if (documentRepository[oldCode]) {
+                        documentRepository[newCode] = documentRepository[oldCode];
+                        if (newCode !== oldCode) delete documentRepository[oldCode];
+                    }
+                    break;
+                }
+            }
+
+            state.editingCourseId = null;
+            renderSubjectsList();
+            showToastNotification("Saved: " + newCode);
+        }
+
+        function deleteCourse(courseId, event) {
+            if (event) event.stopPropagation();
+            if (!confirm(`Delete course ${courseId}?`)) return;
+
+            const yearData = curriculumData[state.selectedYear];
+            for (const semName in yearData) {
+                const initialLength = yearData[semName].length;
+                yearData[semName] = yearData[semName].filter(c => c.id !== courseId);
+                if (yearData[semName].length < initialLength) {
+                    if (documentRepository[courseId]) delete documentRepository[courseId];
+                    break;
+                }
+            }
+
+            renderSubjectsList();
+            showToastNotification("Purged: " + courseId);
+        }
+
+        function renderSubjectsList() {
+            const container = document.getElementById('semesterGroupsContainer');
+            if(!container) return;
+            const yearData = curriculumData[state.selectedYear] || {};
+            const isDark = state.systemTheme === 'dark';
+           
+            let totalCourses = 0;
+            let finalHtml = '';
+
+            for (const semesterName in yearData) {
+                const modules = yearData[semesterName];
+                totalCourses += modules.length;
+
+                let semesterRowsHtml = '';
+
+                if (modules.length === 0) {
+                    semesterRowsHtml = `
+                        <tr>
+                            <td colspan="${state.isAdmin ? 3 : 2}" class="px-6 py-8 text-center text-sm text-gray-400 italic ${isDark ? 'bg-slate-900/40' : 'bg-white'}">
+                                No courses registered inside this context branch template block.
+                            </td>
+                        </tr>
+                    `;
+                } else {
+                    semesterRowsHtml = modules.map(subject => {
+                        const isEditing = state.editingCourseId === subject.id;
+
+                        if (isEditing && state.isAdmin) {
+                            return `
+                                <tr id="edit-row-${subject.id}" class="${isDark ? 'bg-slate-800/40' : 'bg-indigo-50/50'} transition">
+                                    <td class="px-6 py-3 whitespace-nowrap">
+                                        <input type="text" class="edit-code-input text-xs font-bold font-mono uppercase ${isDark ? 'bg-slate-800 text-slate-100 border-slate-700' : 'bg-white text-indigo-700 border-gray-300'} border rounded px-2.5 py-1 focus:outline-none w-28" value="${subject.id}">
+                                    </td>
+                                    <td class="px-6 py-3">
+                                        <input type="text" class="edit-title-input text-sm font-semibold uppercase ${isDark ? 'bg-slate-800 text-slate-100 border-slate-700' : 'bg-white text-gray-800 border-gray-300'} border rounded px-2.5 py-1 focus:outline-none w-full" value="${subject.title}">
+                                    </td>
+                                    <td class="px-6 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex justify-end space-x-2">
+                                            <button onclick="saveCourseEdits('${subject.id}', event)" class="text-emerald-600 hover:text-emerald-400 bg-transparent px-2 py-1 flex items-center gap-0.5"><i data-lucide="check" class="w-3.5 h-3.5"></i>Save</button>
+                                            <button onclick="cancelEditingState(event)" class="text-gray-400 hover:text-gray-200 bg-transparent px-2 py-1 flex items-center gap-0.5"><i data-lucide="x" class="w-3.5 h-3.5"></i>Exit</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        } else {
+                            return `
+                                <tr onclick="selectSubject('${subject.id}')" class="${isDark ? 'hover:bg-slate-800/40 border-slate-800' : 'hover:bg-slate-50 border-gray-100'} border-b transition cursor-pointer group">
+                                    <td class="px-6 py-4 whitespace-nowrap text-xs font-bold font-mono ${isDark ? 'text-slate-400' : 'text-slate-500'} group-hover:text-indigo-400 transition tracking-wider">
+                                        ${subject.id}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-semibold ${isDark ? 'text-slate-200' : 'text-gray-800'} group-hover:text-indigo-400 transition">
+                                        ${subject.title}
+                                    </td>
+                                    ${state.isAdmin ? `
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-xs font-medium" onclick="event.stopPropagation()">
+                                            <div class="flex justify-end space-x-1.5 opacity-40 group-hover:opacity-100 transition">
+                                                <button onclick="setEditingState('${subject.id}', event)" class="text-indigo-400 hover:text-indigo-200 p-1.5 rounded transition"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                                                <button onclick="deleteCourse('${subject.id}', event)" class="text-rose-400 hover:text-rose-200 p-1.5 rounded transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                            </div>
+                                        </td>
+                                    ` : ''}
+                                </tr>
+                            `;
+                        }
+                    }).join('');
+                }
+
+                finalHtml += `
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-2 border-b ${isDark ? 'border-slate-800' : 'border-gray-100'} pb-2">
+                            <i data-lucide="calendar" class="w-4 h-4 text-indigo-500"></i>
+                            <h4 class="text-sm font-bold text-gray-400 uppercase tracking-wider">${semesterName}</h4>
+                        </div>
+                        <div class="border ${isDark ? 'border-slate-800' : 'border-gray-200'} rounded-xl overflow-hidden ${isDark ? 'bg-slate-900/20' : 'bg-white'} shadow-sm">
+                            <table class="min-w-full divide-y ${isDark ? 'divide-slate-800' : 'divide-gray-200'} text-left">
+                                <thead class="${isDark ? 'bg-slate-900/60 text-slate-400' : 'bg-gray-50/70 text-gray-400'} uppercase tracking-wider text-[11px] font-bold">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 w-1/4">Code</th>
+                                        <th scope="col" class="px-6 py-3 w-2/4">Subject Name</th>
+                                        ${state.isAdmin ? `<th scope="col" class="px-6 py-3 text-right w-1/4">Operations</th>` : ''}
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y ${isDark ? 'divide-slate-800 bg-slate-900/10' : 'divide-gray-100 bg-white'}">
+                                    ${semesterRowsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('subjectCountBadge').innerText = `${totalCourses} Courses`;
+            container.innerHTML = finalHtml;
+            lucide.createIcons();
+        }
+
+        function switchResourceSubTab(category) {
+            state.activeResourceTab = category;
+            const papersTab = document.getElementById('subtab-papers');
+            const notesTab = document.getElementById('subtab-notes');
+           
+            if(category === 'papers') {
+                papersTab.className = "flex-1 py-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 flex justify-center items-center space-x-2";
+                notesTab.className = "flex-1 py-4 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex justify-center items-center space-x-2";
+            } else {
+                notesTab.className = "flex-1 py-4 font-semibold text-sm border-b-2 border-indigo-600 text-indigo-600 flex justify-center items-center space-x-2";
+                papersTab.className = "flex-1 py-4 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700 flex justify-center items-center space-x-2";
+            }
+            renderResourcesView();
+        }
+
+        function renderResourcesView() {
+            const listContainer = document.getElementById('resourcesList');
+            const emptyState = document.getElementById('resourcesEmptyState');
+           
+            const subjectId = state.selectedSubject.id;
+            const activeCategory = state.activeResourceTab;
+           
+            const subjectData = documentRepository[subjectId] || { papers: [], notes: [] };
+            const assets = subjectData[activeCategory] || [];
+
+            if (assets.length === 0) {
+                listContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                listContainer.innerHTML = assets.map(file => {
+                    const isPdf = file.format === 'pdf';
+                    return `
+                        <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition ${state.systemTheme === 'dark' ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-200'}">
+                            <div class="flex items-center space-x-3 min-w-0">
+                                <div class="w-9 h-9 ${isPdf ? 'bg-rose-50 text-rose-600' : 'bg-blue-50 text-blue-600'} flex items-center justify-center rounded-lg flex-shrink-0 text-xs font-bold uppercase">
+                                    ${file.format}
+                                </div>
+                                <span class="text-xs font-medium ${state.systemTheme === 'dark' ? 'text-slate-300' : 'text-gray-700'} truncate pr-2">${file.title}</span>
+                            </div>
+                            <button onclick="simulateDownload('${file.title}')" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition flex-shrink-0">
+                                <i data-lucide="download" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function updateFileLabel() {
+            const input = document.getElementById('fileInput');
+            const label = document.getElementById('fileLabel');
+            if (input.files.length > 0) { label.innerText = input.files[0].name; }
+            else { label.innerText = "Choose file..."; }
+        }
+
+        function handleFileUpload(event) {
+            event.preventDefault();
+            if (!state.isAdmin) return alert("Access denied.");
+
+            const type = document.getElementById('uploadType').value;
+            const customTitle = document.getElementById('uploadTitle').value;
+            const fileInput = document.getElementById('fileInput');
+
+            if (fileInput.files.length === 0) return;
+            const fileObj = fileInput.files[0];
+            const nameExtension = fileObj.name.split('.').pop().toLowerCase();
+
+            if (!['pdf', 'doc', 'docx'].includes(nameExtension)) return alert("Accepts only PDF or Word documents.");
+
+            const targetSubjectId = state.selectedSubject.id;
+            const formatLabel = nameExtension === 'pdf' ? 'pdf' : 'doc';
+
+            if (!documentRepository[targetSubjectId]) {
+                documentRepository[targetSubjectId] = { papers: [], notes: [] };
+            }
+
+            documentRepository[targetSubjectId][type].unshift({
+                title: `${customTitle}.${nameExtension}`, format: formatLabel
+            });
+
+            document.getElementById('uploadForm').reset();
+            document.getElementById('fileLabel').innerText = "Choose file...";
+           
+            switchResourceSubTab(type);
+            showToastNotification("Ingested: " + customTitle + "." + nameExtension);
+        }
+
+        function simulateDownload(filename) {
+            const dummyContent = "Payload: " + filename;
+            const blob = new Blob([dummyContent], { type: "text/plain" });
+            const temporaryAnchor = document.createElement("a");
+           
+            temporaryAnchor.href = URL.createObjectURL(blob);
+            temporaryAnchor.download = filename;
+            document.body.appendChild(temporaryAnchor);
+            temporaryAnchor.click();
+           
+            document.body.removeChild(temporaryAnchor);
+            URL.revokeObjectURL(temporaryAnchor.href);
+
+            showToastNotification("Downloaded: " + filename);
+        }
+
+        function showToastNotification(message) {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+           
+            toastMsg.innerText = message;
+            toast.classList.remove('opacity-0', 'translate-y-2', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'translate-y-0');
+           
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-2', 'pointer-events-none');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>
